@@ -32,6 +32,7 @@ class PodcastExtension(BaseExtension):
         self.__itunes_owner = None
         self.__itunes_subtitle = None
         self.__itunes_summary = None
+        self.__itunes_episode_type = None
 
     def extend_ns(self):
         return {'itunes': 'http://www.itunes.com/dtds/podcast-1.0.dtd'}
@@ -95,6 +96,10 @@ class PodcastExtension(BaseExtension):
         if self.__itunes_summary:
             summary = xml_elem('{%s}summary' % ITUNES_NS, channel)
             summary.text = self.__itunes_summary
+
+        if self.__itunes_episode_type in ('Full', 'Trailer', 'Bonus'):
+            episode_type = xml_elem('{%s}episodeType' % ITUNES_NS, channel)
+            episode_type.text = self.__itunes_episode_type
 
         return rss_feed
 
@@ -317,6 +322,21 @@ class PodcastExtension(BaseExtension):
         if itunes_summary is not None:
             self.__itunes_summary = itunes_summary
         return self.__itunes_summary
+
+    def itunes_episode_type(self, itunes_episode_type=None):
+        '''Get or the the itunes:episodeType value of the podcast. This tag should
+        be used to indicate whether your show episode is a trailer, bonus or regular episode (full).
+        The three values for this tag are "Full" (default), "Trailer", and "Bonus".
+
+        :param itunes_episode_type: If the podcast episode is of a certain type
+        :returns: If the episode is a bonus, trailer or a full (regular) episode
+        '''
+        if itunes_episode_type is not None:
+            if itunes_episode_type not in ('', 'Full', 'Trailer', 'Bonus'):
+                raise ValueError('Invalid value for episode_type tag')
+            self.__itunes_episode_type = itunes_episode_type
+        return self.__itunes_episode_type
+
 
     _itunes_categories = {
             'Arts': [
